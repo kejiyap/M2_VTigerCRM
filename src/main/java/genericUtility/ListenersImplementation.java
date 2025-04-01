@@ -1,18 +1,26 @@
 package genericUtility;
 
-import java.io.ObjectInputFilter.Status;
+
+
+import java.io.IOException;
 
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
 public class ListenersImplementation implements ITestListener {
 	
 	JavaUtility jUtil=new JavaUtility();
 	String dateTimeSTamp=jUtil.getCaldenderDetails("dd-MM-YYYY hh-mm-ss");
 	
-    ExtentRepots report;
+    ExtentReports report;
 	ExtentTest test;
 	ThreadLocal <ExtentTest>extentTest=new ThreadLocal<>();
 	
@@ -23,7 +31,7 @@ public class ListenersImplementation implements ITestListener {
 		Reporter.log(methodName+"On Test Start executed");
 		
 		//Adding test method to the extent report
-		test=report.createTest(MethodName);
+		test=report.createTest(methodName);
 		extentTest.set(test);//ITS WORKS ON UNIQUE THREAD FOR PARALLEL EXECUTION
 	
 		}
@@ -35,7 +43,7 @@ public class ListenersImplementation implements ITestListener {
 		Reporter.log(methodName+"On Test Success executed");
 		
 		//Logging test Info
-				test.log(Status.PASS,methodname+"On Test sucessfully executed");
+				test.log(Status.PASS,methodName+"On Test sucessfully executed");
 				extentTest.get().log(Status.PASS,methodName+"test successfully executed");
 	}
 
@@ -50,17 +58,17 @@ public class ListenersImplementation implements ITestListener {
 				extentTest.get().log(Status.FAIL,methodName+"test failed");
 				
 				//Logging error message
-				test.log(Status,INFO,result,getThrowable());
+				test.log(Status.INFO,result.getThrowable());
 				
 		
 		//Taking screenshot when script fails
 		SeleniumUtility1 sUtil=new SeleniumUtility1();
 		try {
-			String path=sUtil.takeScreenshot(BaseClass,getDriver(), dataTimeStamp);
+			String path=sUtil.takeScreenshot(BaseClass.getDriver(), dateTimeSTamp);
 	//		Attaching screenshort to report
 	//		test.addScreenCaptureFromPath(path);
 		}
-		catch(IO Exeception e )
+		catch(IOException e )
 		{
 		e.printStackTrace();	
 		}
@@ -89,13 +97,13 @@ public class ListenersImplementation implements ITestListener {
 		
 		System.out.println("On start executed");
 		//Configuration of ExtentReports 
-		ExtentSparkReporter("//Extentreporter\\report"+dateTimeStamp+"html");
+		ExtentSparkReporter reporter = new ExtentSparkReporter("//Extentreporter\\report"+dateTimeSTamp+"html");
 		
 		reporter.config().setDocumentTitle("VTiger Report");
 		reporter.config().setTheme(Theme.STANDARD);
 		
 		//Create an empty report with the configuration
-		report=new ExtentReport();
+		report=new ExtentReports();
 		report.attachReporter(reporter);
 		report.setSystemInfo("Base URL","hhttp://localhost:8888");
 		report.setSystemInfo("Base browser","Chrome");

@@ -120,7 +120,7 @@ public class SeleniumUtility1 {
 	 */
 	public void scrollWebpageToWebElement(WebDriver driver, WebElement ele)
 	{
-		Action act=new Action(driver);
+		Actions act=new Actions(driver);
 		act.scrollToElement(ele).perform();
 
 	}
